@@ -5,7 +5,7 @@ library(tidyverse)
 library(leaflet)
 library(shinydashboard)
 
-source('model/generate_data.R')
+source(paste0(getwd(), "/model/generate_data.R"))
 
 # nos bajamos  los datos, actualizados a día de ayer ----
 
