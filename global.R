@@ -1,7 +1,6 @@
 
 
-load_pkg <- rlang::quos(shiny,tidyverse, shinydashboard, ggplot2, lubridate, grid, sp,
-                        leafpop,leaflet, RColorBrewer)
+load_pkg <- rlang::quos(shiny,tidyverse, shinydashboard, ggplot2, lubridate, grid, sp,leafpop,leaflet, RColorBrewer, plotly)
 
 invisible(lapply(lapply(load_pkg, rlang::quo_name),
                  library,

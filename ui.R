@@ -25,12 +25,13 @@ sidebar <- dashboardSidebar(
                 menuItem("Indicadores",
                          tabName = "indicadores_estrategicos",
                          icon = icon("handshake-o"),
+                         menuSubItem("Evolutivo", icon = icon("calendar"),
+                                     tabName = "Tabla_evolutivo"),
                          menuSubItem("Comparación paises", icon = icon("list-alt"),
                                      tabName = "compare_countries"),
                          menuSubItem("Pdte", icon = icon("calendar"),
-                                     tabName = "pdte"),
-                         menuSubItem("Evolutivo", icon = icon("calendar"),
-                                     tabName = "Tabla_evolutivo")
+                                     tabName = "pdte")
+
                 ),
                 br(),
                 br()
