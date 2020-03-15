@@ -5,6 +5,9 @@ library(tidyverse)
 library(leaflet)
 library(shinydashboard)
 
+
+source(paste0(getwd(), "/model/generate_data.R"))
+
 # nos bajamos  los datos, actualizados a día de ayer ----
 
 url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
