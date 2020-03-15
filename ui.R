@@ -51,7 +51,8 @@ body <- dashboardBody(
     #                     "))
     # ),
     tabItems(
-        tab_mapa
+        tab_mapa,
+        tab_evolutivo
         # tabitem3
     )
 )
