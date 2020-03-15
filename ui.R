@@ -28,7 +28,9 @@ sidebar <- dashboardSidebar(
                          menuSubItem("Comparación paises", icon = icon("list-alt"),
                                      tabName = "compare_countries"),
                          menuSubItem("Pdte", icon = icon("calendar"),
-                                     tabName = "pdte")
+                                     tabName = "pdte"),
+                         menuSubItem("Evolutivo", icon = icon("calendar"),
+                                     tabName = "Tabla_evolutivo")
                 ),
                 br(),
                 br()
@@ -49,7 +51,8 @@ body <- dashboardBody(
     #                     "))
     # ),
     tabItems(
-        tab_mapa
+        tab_mapa,
+        tab_evolutivo
         # tabitem3
     )
 )
