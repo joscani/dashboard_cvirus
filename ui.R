@@ -7,7 +7,7 @@ library(leafpop)
 
 
 ancho_titulo_side = 200
-logo_coronavius <- "https://voluntarios.telefonica.com/sites/default/files/brutus_logo.png"
+logo_coronavius <- "buscar logo" 
 # header
 header <- dashboardHeader( title = "Corona virus \n dashboard",
                            titleWidth = ancho_titulo_side
@@ -19,6 +19,7 @@ sidebar <- dashboardSidebar(
     width = ancho_titulo_side,
     sidebarMenu(id = "sidebarmenu",
                 style = "position: fixed; overflow: visible;",
+                
                 menuItem("Mapa casos",
                          tabName = "Mapa_global", icon = icon("globe")),
                 
