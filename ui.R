@@ -10,14 +10,6 @@ ancho_titulo_side = 200
 logo_coronavius <- "https://voluntarios.telefonica.com/sites/default/files/brutus_logo.png"
 # header
 header <- dashboardHeader( title = "Corona virus \n dashboard",
-                           # tags$li(a(href = 'https://voluntarios.telefonica.com',
-                           #           img(src = logo,
-                           #               title = "Company Home", height = "20px"),
-                           #            title = "Company link"),
-                           # #          class = "dropdown"),
-                           # dropdownMenuOutput("messageMenu"),
-                           # dropdownMenuOutput("messageMenu2"),
-                           # 
                            titleWidth = ancho_titulo_side
                            )
 
