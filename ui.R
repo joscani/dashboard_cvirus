@@ -7,7 +7,7 @@ library(leafpop)
 
 
 ancho_titulo_side = 200
-logo_coronavius <- "https://voluntarios.telefonica.com/sites/default/files/brutus_logo.png"
+logo_coronavius <- "buscar logo" 
 # header
 header <- dashboardHeader( title = "Corona virus \n dashboard",
                            titleWidth = ancho_titulo_side
@@ -19,16 +19,20 @@ sidebar <- dashboardSidebar(
     width = ancho_titulo_side,
     sidebarMenu(id = "sidebarmenu",
                 style = "position: fixed; overflow: visible;",
+                
                 menuItem("Mapa casos",
                          tabName = "Mapa_global", icon = icon("globe")),
                 
                 menuItem("Indicadores",
                          tabName = "indicadores_estrategicos",
                          icon = icon("handshake-o"),
+                         menuSubItem("Evolutivo", icon = icon("calendar"),
+                                     tabName = "Tabla_evolutivo"),
                          menuSubItem("Comparación paises", icon = icon("list-alt"),
                                      tabName = "compare_countries"),
                          menuSubItem("Pdte", icon = icon("calendar"),
                                      tabName = "pdte")
+
                 ),
                 br(),
                 br()
@@ -49,7 +53,8 @@ body <- dashboardBody(
     #                     "))
     # ),
     tabItems(
-        tab_mapa
+        tab_mapa,
+        tab_evolutivo
         # tabitem3
     )
 )

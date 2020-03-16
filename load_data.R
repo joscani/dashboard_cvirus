@@ -5,24 +5,49 @@ library(tidyverse)
 library(leaflet)
 library(shinydashboard)
 
-# nos bajamos  los datos, actualizados a día de ayer ----
 
-url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
+source(paste0(getwd(), "/model/generate_data.R"))
 
-cvirus <-  read_csv(url)
+# Confirmados ---- 
+
+url_confirmados <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
+
+cvirus_confirmed <-  read_csv(url_confirmados)
+
+
+
+# Recuperados
+
+url_recovered <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv"
+
+cvirus_recovered <- read_csv(url_recovered)
 
 # cvirus$`Province/State`<- NULL
 
 
 # Pasamos a formato largo ----
 
-cvirus_longer <- cvirus %>%
+cvirus_confirmed_longer <- cvirus_confirmed %>%
     pivot_longer(
-        cols = 5:ncol(cvirus),
+        cols = 5:ncol(cvirus_confirmed),
         values_to = "casos"
     )
 
-colnames(cvirus_longer) <- c("provincia_estado","pais", "Lat", "Long", "fecha", "casos")
+cvirus_recovered_longer <-  cvirus_recovered %>% 
+    pivot_longer(
+        cols = 5:ncol(cvirus_recovered),
+        values_to = "recuperados"
+    )
+
+cvirus_longer <-  cvirus_confirmed_longer %>%
+    left_join(
+        cvirus_recovered_longer,
+        by =  c("Province/State", "Country/Region", "Lat", "Long", "name")
+    )
+
+
+
+colnames(cvirus_longer) <- c("provincia_estado","pais", "Lat", "Long", "fecha", "casos", "recuperados")
 
 cvirus_longer$fecha <- as.Date(as.character(cvirus_longer$fecha), format = "%m/%d/%y")
 
@@ -35,33 +60,38 @@ cvirus_longer <-  cvirus_longer %>%
 # mapa con el último dato -----
 ## sub graphs 
 
-res  <- cvirus_longer %>% 
-    # filter(provincia_estado!= "Diamond Princess") %>% 
-    group_by(pais, fecha) %>% 
+res  <- cvirus_longer %>%
+    # filter(provincia_estado!= "Diamond Princess") %>%
+    group_by(pais, fecha) %>%
     arrange(fecha) %>%
-    arrange(-casos) %>% 
-    summarise(casos = sum(casos),
-              Lat = first(Lat),
-              Long = first(Long)) %>% 
-    mutate(casos_prev_day = lag(casos, n = 1,  default = 0),
-           casos_nuevos = casos - casos_prev_day) %>% 
+    arrange(-casos) %>%
+    summarise(
+        casos = sum(casos),
+        recuperados = sum(recuperados),
+        Lat = first(Lat),
+        Long = first(Long)
+    ) %>%
+    mutate(
+        casos_prev_day = lag(casos, n = 1,  default = 0),
+        casos_nuevos = casos - casos_prev_day,
+        recuperados_prev_day = lag(recuperados, n = 1, default = 0),
+        recuperados_nuevos = recuperados - recuperados_prev_day
+    ) %>%
     filter(casos >= 5) %>%
     mutate(
-        casos_nuevos = if_else(casos_nuevos==0,
-                               lag(casos_nuevos,1),
+        casos_nuevos = if_else(casos_nuevos == 0,
+                               lag(casos_nuevos, 1),
                                casos_nuevos),
-        dia_since_5 = row_number()) 
-
-
-
-
+        dia_since_5 = row_number()
+    )
 
 
 
 cvirus_map_data <- res %>% 
     group_by(pais) %>% 
     filter(fecha == max(fecha)) %>% 
-    mutate(casos = sum(casos)) %>% 
+    mutate(casos = sum(casos),
+           recuperados = sum(recuperados)) %>% 
     ungroup()
 
 
