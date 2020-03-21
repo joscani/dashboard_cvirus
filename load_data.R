@@ -8,24 +8,16 @@ library(shinydashboard)
 
 source(paste0(getwd(), "/model/generate_data.R"))
 
-# Confirmados ---- 
 
-url_confirmados <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
+## John Hopkins data ----
 
-cvirus_confirmed <-  read_csv(url_confirmados)
+cvirus_confirmed <-  read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
 
+cvirus_recovered <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
 
+cvirus_death <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
 
-# Recuperados
-
-url_recovered <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv"
-
-cvirus_recovered <- read_csv(url_recovered)
-
-# cvirus$`Province/State`<- NULL
-
-
-# Pasamos a formato largo ----
+# Pasamos a formato largo 
 
 cvirus_confirmed_longer <- cvirus_confirmed %>%
     pivot_longer(
@@ -39,15 +31,27 @@ cvirus_recovered_longer <-  cvirus_recovered %>%
         values_to = "recuperados"
     )
 
+cvirus_death_longer <-  cvirus_death %>% 
+    pivot_longer(
+        cols = 5:ncol(cvirus_death),
+        values_to = "fallecidos"
+    )
+
+
+
 cvirus_longer <-  cvirus_confirmed_longer %>%
     left_join(
         cvirus_recovered_longer,
+        by =  c("Province/State", "Country/Region", "Lat", "Long", "name")
+    ) %>% 
+    left_join(
+        cvirus_death_longer,
         by =  c("Province/State", "Country/Region", "Lat", "Long", "name")
     )
 
 
 
-colnames(cvirus_longer) <- c("provincia_estado","pais", "Lat", "Long", "fecha", "casos", "recuperados")
+colnames(cvirus_longer) <- c("provincia_estado","pais", "Lat", "Long", "fecha", "casos", "recuperados", "fallecidos")
 
 cvirus_longer$fecha <- as.Date(as.character(cvirus_longer$fecha), format = "%m/%d/%y")
 
@@ -55,11 +59,10 @@ cvirus_longer <-  cvirus_longer %>%
     mutate(provincia_estado = if_else(is.na(provincia_estado), pais, provincia_estado)) %>% 
     filter(casos>0)
 
-# mapa con el último dato -----
 
-# mapa con el último dato -----
-## sub graphs 
+# mapa con el último dato
 
+## TODO Create interaactive with days since filter(casos >= input$ncasos)
 res  <- cvirus_longer %>%
     # filter(provincia_estado!= "Diamond Princess") %>%
     group_by(pais, fecha) %>%
@@ -68,6 +71,7 @@ res  <- cvirus_longer %>%
     summarise(
         casos = sum(casos),
         recuperados = sum(recuperados),
+        fallecidos = sum(fallecidos),
         Lat = first(Lat),
         Long = first(Long)
     ) %>%
@@ -75,31 +79,36 @@ res  <- cvirus_longer %>%
         casos_prev_day = lag(casos, n = 1,  default = 0),
         casos_nuevos = casos - casos_prev_day,
         recuperados_prev_day = lag(recuperados, n = 1, default = 0),
-        recuperados_nuevos = recuperados - recuperados_prev_day
+        recuperados_nuevos = recuperados - recuperados_prev_day,
+        fallecidos_prev_day = lag(fallecidos, n = 1, default = 0),
+       fallecidos_nuevos = fallecidos - fallecidos_prev_day,
+        
     ) %>%
-    filter(casos >= 5) %>%
+    filter(casos >= 100) %>%
     mutate(
         casos_nuevos = if_else(casos_nuevos == 0,
                                lag(casos_nuevos, 1),
                                casos_nuevos),
-        dia_since_5 = row_number()
+        dia_since_100 = row_number()
     )
-
 
 
 cvirus_map_data <- res %>% 
     group_by(pais) %>% 
     filter(fecha == max(fecha)) %>% 
     mutate(casos = sum(casos),
-           recuperados = sum(recuperados)) %>% 
+           recuperados = sum(recuperados),
+           fallecidos = sum(fallecidos)) %>% 
     ungroup()
+
+## TODO try to change to highcharter and conver to interactive shiny
 
 
 p_subs <- map(cvirus_map_data$pais, function(pais_select) {
     df <- res %>% 
         filter(pais== pais_select)
     p <- df %>%
-        ggplot( aes(x = dia_since_5, y = casos_nuevos, group = 1))
+        ggplot( aes(x = dia_since_100, y = casos_nuevos, group = 1))
     p +  
         geom_point(size = rel(1.5)) + 
         geom_line() +
