@@ -4,6 +4,7 @@
 library(tidyverse)
 library(leaflet)
 library(shinydashboard)
+library(htmltools)
 
 
 source(paste0(getwd(), "/model/generate_data.R"))
@@ -60,7 +61,7 @@ cvirus_longer <-  cvirus_longer %>%
     filter(casos>0)
 
 
-# mapa con el último dato
+# Mapa con el último dato ----
 
 ## TODO Create interaactive with days since filter(casos >= input$ncasos)
 res  <- cvirus_longer %>%
@@ -125,10 +126,21 @@ names(p_subs) <- cvirus_map_data$pais
 
 pal <- colorNumeric(
     palette = "Reds",
-    domain = c(-1, log(max(cvirus_map_data$casos + 1)))
+    domain = c(-1, log(max(cvirus_map_data$fallecidos + 1)))
 )
-#
-#
+
+cvirus_map_data$labs <- map_chr(seq(nrow(cvirus_map_data)), function(i) {
+    paste0( '<p>', cvirus_map_data[i, "pais"], '<p></p>', 
+            "Casos: ",cvirus_map_data[i, "casos"], '<p></p>', 
+            "Recuperados: ",cvirus_map_data[i, "recuperados"],'</p><p>', 
+            "Fallecidos: ",cvirus_map_data[i, "fallecidos"], '</p>' ) 
+})
+
+# cvirus_map_data$labs <- map(seq(nrow(cvirus_map_data)),
+#                             function(i){
+#                                 HTML(cvirus_map_data[i, "labs"])
+#                             })
+
 mapa <- 
     leaflet(cvirus_map_data) %>%
     # addProviderTiles('CartoDB.Positron') %>%
@@ -137,8 +149,8 @@ mapa <-
         group =  "pais",
         lng = ~ Long,
         lat = ~ Lat,
-        label = ~ paste0(pais, ": ", casos ),
-        radius = ~ 3 * log( casos + 1 ) ,
-        color = ~ pal(log( casos + 1 ) )
+        label = lapply(cvirus_map_data$labs, htmltools::HTML),
+        radius = ~ 3 * log( fallecidos + 1 ) ,
+        color = ~ pal(log( fallecidos + 1 ) )
     ) %>% 
     addPopupGraphs(p_subs , group = "pais")

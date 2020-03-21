@@ -10,6 +10,7 @@ tab_mapa <- tabItem(
     valueBoxOutput("recuperados")
   ),
   br(),
+  h5("Radio círculos =  3 * log( fallecidos + 1 )"),
   fluidRow(
     leafletOutput("mapa_global", width="100%",height="600px")
   )

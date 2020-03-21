@@ -20,17 +20,19 @@ sidebar <- dashboardSidebar(
     sidebarMenu(id = "sidebarmenu",
                 style = "position: fixed; overflow: visible;",
                 
-                menuItem("Mapa casos",
+                menuItem("Mapa",
                          tabName = "Mapa_global", icon = icon("globe")),
+                       
+                menuItem("Evolutivo",
+                         tabName = "Tabla_evolutivo", icon = icon("calendar")),
                 
-                menuItem("Indicadores",
+                
+                menuItem("Indicadores (por definir)",
                          tabName = "indicadores_estrategicos",
                          icon = icon("handshake-o"),
-                         menuSubItem("Evolutivo", icon = icon("calendar"),
-                                     tabName = "Tabla_evolutivo"),
-                         menuSubItem("Comparación paises", icon = icon("list-alt"),
+                         menuSubItem("Ind1", icon = icon("list-alt"),
                                      tabName = "compare_countries"),
-                         menuSubItem("Pdte", icon = icon("calendar"),
+                         menuSubItem("Ind2", icon = icon("calendar"),
                                      tabName = "pdte")
 
                 ),
