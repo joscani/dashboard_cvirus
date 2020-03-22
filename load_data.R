@@ -9,7 +9,7 @@ library(leafpop)
 
 
 source(paste0(getwd(), "/model/generate_data.R"))
-source(paste0(getwd(), "/model/generate_ccaa_data.R"))
+# source(paste0(getwd(), "/model/generate_ccaa_data.R"))
 
 ## John Hopkins data ----
 
