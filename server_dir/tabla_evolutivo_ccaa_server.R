@@ -1,6 +1,6 @@
 library(shinydashboard)
 library(plotly)
-library(highcharter)
+require(highcharter)
 
 reactive_ccaas_selected <- reactive({
   

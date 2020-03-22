@@ -1,7 +1,7 @@
 # tags$style('.input-sm {font-size: 40px; } label {font-weight: 500; margin-bottom: 15px; }'),
 # In global.R we load libraries and code source for ui.r and server.R
 library(shinydashboard)
-# library(highcharter)
+require(highcharter)
 library(leaflet)
 library(leafpop)
 

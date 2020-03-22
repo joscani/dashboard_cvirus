@@ -1,5 +1,6 @@
 # Vista estratégicos
 library(shinydashboard)
+require(highcharter)
 
 tab_evolutivo_ccaa <- tabItem(
   tabName = 'Tabla_evolutivo_ccaa',
