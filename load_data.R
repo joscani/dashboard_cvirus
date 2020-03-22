@@ -105,12 +105,6 @@ cvirus_map_data <- res %>%
            fallecidos = sum(fallecidos)) %>% 
     ungroup()
 
-var_ccaa_list <- c("casos_por_100_mil_habitantes",
-                   "recuperados_por_100_mil_habitantes",
-                   "fallecidos_por_100_mil_habitantes",
-                   "casos_nuevos_por_100_mil_habitantes",
-                   "recuperados_diarios_por_100_mil_habitantes",
-                   "fallecidos_diarios_por_100_mil_habitantes")
 
 ## TODO try to change to highcharter and conver to interactive shiny
 
@@ -331,7 +325,22 @@ ccaa_data_subplots <-  ccaa_longer %>%
         dia_since_1 = row_number()
     )
 
-    
+
+
+ccaas_choice <-  setdiff(unique(ccaa_data_subplots$CCAA), "Total")
+var_ccaa_list <- c("casos",
+                   "recuperados",
+                   "fallecidos",
+                   "casos_nuevos",
+                   "recuperados_nuevos",
+                   "fallecidos_nuevos")
+
+var_ccaa_list_mapa <- c("casos_por_100_mil_habitantes",
+                        "recuperados_por_100_mil_habitantes",
+                        "fallecidos_por_100_mil_habitantes")
+
+
+   
 ccaa_map_data <- ccaa_data_subplots %>% 
     filter(CCAA != "Total" & fecha == max(fecha)) %>% 
     mutate (

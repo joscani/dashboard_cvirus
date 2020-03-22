@@ -21,12 +21,15 @@ sidebar <- dashboardSidebar(
                 
                 menuItem("Mapa Global",
                          tabName = "Mapa_global", icon = icon("globe")),
+                menuItem("Evolutivo",
+                         tabName = "Tabla_evolutivo", icon = icon("calendar")),
                 
                 menuItem("Mapa España",
                          tabName = "Mapa_ccaa", icon = icon("globe")),
-                
-                menuItem("Evolutivo",
-                         tabName = "Tabla_evolutivo", icon = icon("calendar")),
+                menuItem("Evolutivo CCAA",
+                         tabName = "Tabla_evolutivo_ccaa", icon = icon("calendar")),
+            
+
                 
                 
                 menuItem("Indicadores (por definir)",
@@ -59,7 +62,8 @@ body <- dashboardBody(
     tabItems(
         tab_mapa_ccaa,
         tab_mapa,
-        tab_evolutivo
+        tab_evolutivo,
+        tab_evolutivo_ccaa 
         # tabitem3
     )
 )
