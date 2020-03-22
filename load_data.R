@@ -383,9 +383,66 @@ mapa_ccaa_leaflet <-
     leaflet(mapa_ccaa) %>%
     addProviderTiles("Stamen.Toner") %>%
     addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                group = "CCAA",
+                group = "Ingresos UCI",
                 opacity = 1.0, fillOpacity = 0.5,
                 fillColor = ~colorNumeric("Reds", ingresos_uci)(ingresos_uci),
                 label = lapply(mapa_ccaa$labs, htmltools::HTML),
                 highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                    bringToFront = TRUE))
+                                                    bringToFront = TRUE)) %>% 
+    addLegend("bottomleft", pal =  colorNumeric("Reds", mapa_ccaa$ingresos_uci),
+              values = ~ingresos_uci,
+              title = "Ingresos UCI",
+              group = "Ingresos UCI",
+              # labFormat = labelFormat(prefix = "$"),
+              opacity = 1) %>% 
+    
+    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                group = "Casos",
+                opacity = 1.0, fillOpacity = 0.5,
+                fillColor = ~colorNumeric("Blues", casos)(casos),
+                label = lapply(mapa_ccaa$labs, htmltools::HTML),
+                highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                    bringToFront = TRUE)) %>% 
+    addLegend("bottomleft", pal =  colorNumeric("Blues", mapa_ccaa$casos),
+              values = ~casos,
+              title = "Casos",
+              group = "Casos",
+              # labFormat = labelFormat(prefix = "$"),
+              opacity = 1) %>% 
+    
+    
+    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                group = "Fallecidos",
+                opacity = 1.0, fillOpacity = 0.5,
+                fillColor = ~colorNumeric("Reds", fallecidos)(fallecidos),
+                label = lapply(mapa_ccaa$labs, htmltools::HTML),
+                highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                    bringToFront = TRUE)) %>% 
+    addLegend("bottomright", pal =  colorNumeric("Reds", mapa_ccaa$fallecidos),
+              values = ~fallecidos,
+              title = "Fallecidos",
+              group = "Fallecidos",
+              # labFormat = labelFormat(prefix = "$"),
+              opacity = 1) %>% 
+    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                group = "Recuperados",
+                opacity = 1.0, fillOpacity = 0.5,
+                fillColor = ~colorNumeric("Greens", recuperados)(recuperados),
+                label = lapply(mapa_ccaa$labs, htmltools::HTML),
+                highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                    bringToFront = TRUE)) %>% 
+    addLegend("bottomright", pal =  colorNumeric("Greens", mapa_ccaa$recuperados),
+              values = ~recuperados,
+              title = "Recuperados",
+              group = "Recuperados",
+              # labFormat = labelFormat(prefix = "$"),
+              opacity = 1) %>% 
+    
+    # Layers control
+    addLayersControl(
+        baseGroups = c("Casos", "Ingresos UCI","Fallecidos","Recuperados" ),
+        # overlayGroups = c("Quakes", "Outline"),
+        options = layersControlOptions(collapsed = FALSE)
+    )
+
+    

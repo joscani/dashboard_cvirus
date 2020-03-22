@@ -8,7 +8,8 @@ library(shinydashboard)
     h2("Fecha actualización datos: ") , h2(textOutput("max_fecha")),
     fluidRow(
       valueBoxOutput("contagiados"),
-      valueBoxOutput("recuperados")
+      valueBoxOutput("recuperados"),
+      valueBoxOutput("fallecidos")
     ),
     br(),
     h5("Radio círculos =  3 * log( fallecidos + 1 )"),
