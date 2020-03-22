@@ -13,7 +13,6 @@ header <- dashboardHeader( title = "Corona virus \n dashboard",
                            titleWidth = ancho_titulo_side
                            )
 
-
 # sidebar
 sidebar <- dashboardSidebar(
     width = ancho_titulo_side,

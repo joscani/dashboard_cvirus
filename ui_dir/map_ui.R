@@ -9,10 +9,11 @@ library(shinydashboard)
     fluidRow(
       valueBoxOutput("contagiados"),
       valueBoxOutput("recuperados"),
-      valueBoxOutput("fallecidos")
+      valueBoxOutput("fallecidos"),
+      valueBoxOutput("activos")
     ),
     br(),
-    h5("Radio círculos =  3 * log( fallecidos + 1 )"),
+    # h5("Radio círculos =  3 * log( fallecidos + 1 )"),
     fluidRow(
       leafletOutput("mapa_global", width="100%",height="600px")
     )

@@ -7,7 +7,6 @@ library(shinydashboard)
 library(htmltools)
 library(leafpop)
 
-
 source(paste0(getwd(), "/model/generate_data.R"))
 # source(paste0(getwd(), "/model/generate_ccaa_data.R"))
 
@@ -106,8 +105,12 @@ cvirus_map_data <- res %>%
            fallecidos = sum(fallecidos)) %>% 
     ungroup()
 
-var_global_list <-  c("casos","recuperados", "fallecidos", "casos_nuevos", 
-                      "recuperados_nuevos", "fallecidos_nuevos")
+var_ccaa_list <- c("casos_por_100_mil_habitantes",
+                   "recuperados_por_100_mil_habitantes",
+                   "fallecidos_por_100_mil_habitantes",
+                   "casos_nuevos_por_100_mil_habitantes",
+                   "recuperados_diarios_por_100_mil_habitantes",
+                   "fallecidos_diarios_por_100_mil_habitantes")
 
 ## TODO try to change to highcharter and conver to interactive shiny
 
@@ -291,6 +294,10 @@ ccaa_longer <- ccaa_casos_longer %>%
               by = c("cod_ine", "fecha"))
 ccaa_longer$fecha <- as.Date(as.character(ccaa_longer$fecha), format = "%d/%m/%y")
 
+pob_ccaa <- readRDS("data/pob_ccaa.rds")
+
+ccaa_longer <- ccaa_longer %>% left_join(pob_ccaa, by = c("cod_ine" = "Codigo"))
+
 ## Mapa ccaa ----
 
 mapa_ccaa <- readRDS("data/mapa_ccaa.rds")
@@ -303,7 +310,8 @@ ccaa_data_subplots <-  ccaa_longer %>%
         casos = sum(casos),
         recuperados = sum(altas),
         fallecidos = sum(fallecidos),
-        ingresos_uci = sum(ingresos_uci)
+        ingresos_uci = sum(ingresos_uci),
+        pob2019 = first(pob2019)
     ) %>% 
     mutate(
         casos_prev_day = lag(casos, n = 1,  default = 0),
@@ -325,14 +333,16 @@ ccaa_data_subplots <-  ccaa_longer %>%
 
     
 ccaa_map_data <- ccaa_data_subplots %>% 
-    filter(CCAA != "Total") %>% 
-    group_by(cod_ine, CCAA) %>% 
-    filter(fecha == max(fecha)) %>% 
-    mutate(casos = sum(casos),
-           recuperados = sum(recuperados),
-           fallecidos = sum(fallecidos),
-           ingresos_uci = sum(ingresos_uci, na.rm =TRUE)
-           ) %>% 
+    filter(CCAA != "Total" & fecha == max(fecha)) %>% 
+    mutate (
+        casos_por_100_mil_habitantes = 1e5 * casos / pob2019,
+        recuperados_por_100_mil_habitantes = 1e5 * recuperados / pob2019,
+        fallecidos_por_100_mil_habitantes = 1e5 * fallecidos / pob2019,
+        casos_nuevos_por_100_mil_habitantes = 1e5 * casos_nuevos / pob2019,
+        recuperados_diarios_por_100_mil_habitantes = 1e5 * recuperados_nuevos / pob2019,
+        fallecidos_diarios_por_100_mil_habitantes = 1e5 * fallecidos_nuevos / pob2019
+        
+    ) %>% 
     ungroup()
 
 
@@ -379,70 +389,28 @@ mapa_ccaa  <-  mapa_ccaa %>%
     inner_join(ccaa_map_data, by = c("Codigo" = "cod_ine") )
 
 
-mapa_ccaa_leaflet <- 
-    leaflet(mapa_ccaa) %>%
-    addProviderTiles("Stamen.Toner") %>%
-    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                group = "Ingresos UCI",
-                opacity = 1.0, fillOpacity = 0.5,
-                fillColor = ~colorNumeric("Reds", ingresos_uci)(ingresos_uci),
-                label = lapply(mapa_ccaa$labs, htmltools::HTML),
-                highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                    bringToFront = TRUE)) %>% 
-    addLegend("bottomleft", pal =  colorNumeric("Reds", mapa_ccaa$ingresos_uci),
-              values = ~ingresos_uci,
-              title = "Ingresos UCI",
-              group = "Ingresos UCI",
-              # labFormat = labelFormat(prefix = "$"),
-              opacity = 1) %>% 
-    
-    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                group = "Casos",
-                opacity = 1.0, fillOpacity = 0.5,
-                fillColor = ~colorNumeric("Blues", casos)(casos),
-                label = lapply(mapa_ccaa$labs, htmltools::HTML),
-                highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                    bringToFront = TRUE)) %>% 
-    addLegend("bottomleft", pal =  colorNumeric("Blues", mapa_ccaa$casos),
-              values = ~casos,
-              title = "Casos",
-              group = "Casos",
-              # labFormat = labelFormat(prefix = "$"),
-              opacity = 1) %>% 
-    
-    
-    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                group = "Fallecidos",
-                opacity = 1.0, fillOpacity = 0.5,
-                fillColor = ~colorNumeric("Reds", fallecidos)(fallecidos),
-                label = lapply(mapa_ccaa$labs, htmltools::HTML),
-                highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                    bringToFront = TRUE)) %>% 
-    addLegend("bottomright", pal =  colorNumeric("Reds", mapa_ccaa$fallecidos),
-              values = ~fallecidos,
-              title = "Fallecidos",
-              group = "Fallecidos",
-              # labFormat = labelFormat(prefix = "$"),
-              opacity = 1) %>% 
-    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                group = "Recuperados",
-                opacity = 1.0, fillOpacity = 0.5,
-                fillColor = ~colorNumeric("Greens", recuperados)(recuperados),
-                label = lapply(mapa_ccaa$labs, htmltools::HTML),
-                highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                    bringToFront = TRUE)) %>% 
-    addLegend("bottomright", pal =  colorNumeric("Greens", mapa_ccaa$recuperados),
-              values = ~recuperados,
-              title = "Recuperados",
-              group = "Recuperados",
-              # labFormat = labelFormat(prefix = "$"),
-              opacity = 1) %>% 
-    
-    # Layers control
-    addLayersControl(
-        baseGroups = c("Casos", "Ingresos UCI","Fallecidos","Recuperados" ),
-        # overlayGroups = c("Quakes", "Outline"),
-        options = layersControlOptions(collapsed = FALSE)
-    )
+pal1 <- colorNumeric(
+    palette = "Reds",
+    domain = mapa_ccaa$casos_por_100_mil_habitantes)
 
-    
+mapa_ccaa_leaflet <-
+    leaflet(mapa_ccaa) %>%
+    addProviderTiles("Stamen.Toner")  %>%
+    addPolygons(
+        color = "#444444",
+        weight = 1,
+        smoothFactor = 0.5,
+        # group = "Ingresos UCI",
+        opacity = 1.0,
+        fillOpacity = 0.5,
+        fillColor = ~ pal1(casos_por_100_mil_habitantes),
+        label = lapply(mapa_ccaa$labs, htmltools::HTML),
+        highlightOptions = highlightOptions(
+            color = "white",
+            weight = 2,
+            bringToFront = TRUE
+        )) %>% 
+    addLegend(position = "topleft",
+                     pal = pal1,
+              values = ~casos_por_100_mil_habitantes,
+                     title = "casos_por_100_mil_habitantes")
