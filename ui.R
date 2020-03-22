@@ -20,9 +20,12 @@ sidebar <- dashboardSidebar(
     sidebarMenu(id = "sidebarmenu",
                 style = "position: fixed; overflow: visible;",
                 
-                menuItem("Mapa",
+                menuItem("Mapa Global",
                          tabName = "Mapa_global", icon = icon("globe")),
-                       
+                
+                menuItem("Mapa España",
+                         tabName = "Mapa_ccaa", icon = icon("globe")),
+                
                 menuItem("Evolutivo",
                          tabName = "Tabla_evolutivo", icon = icon("calendar")),
                 
@@ -55,6 +58,7 @@ body <- dashboardBody(
     #                     "))
     # ),
     tabItems(
+        tab_mapa_ccaa,
         tab_mapa,
         tab_evolutivo
         # tabitem3

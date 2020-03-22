@@ -1,8 +1,5 @@
 
-
-output$mapa_global <- renderLeaflet({
-    mapa
-})
+output$mapa_global <- renderLeaflet(mapa_global_leaf)
 
 output$max_fecha <-  renderText({
     fecha_max <- cvirus_longer %>%
