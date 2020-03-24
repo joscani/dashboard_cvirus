@@ -43,4 +43,29 @@ output$tabla_evolutivo_ccaa <- renderHighchart({
   
 })
 
+output$tabla_evolutivo_ccaa_raw <- renderHighchart({
+  
+  validate(
+    need(nrow(reactive_ccaas_selected()) != 0, "Selecciona al menos una CCAA")
+  ) 
+  tmp <- reactive_ccaas_selected()
+  chart <- tmp %>% 
+    mutate(indicador =  variable) %>% 
+    hchart("spline", hcaes(x = dias, y = indicador, group = CCAA)) %>% 
+    hc_xAxis( title = list( text = paste0("Dias desde que se confirmaron ", input$contagiado_n, " casos")),
+              labels = list(style=list(fonSize = "16px")) ) %>%
+    hc_yAxis( title = list( text = paste0(input$ccaa_indicador1, " ")), labels = list(style=list(fonSize = "16px")) ) %>%
+    hc_legend(enabled = FALSE) %>%
+    
+    # hc_add_theme(hc_theme_smpl()) %>%
+    hc_title(text = paste0(input$ccaa_indicador1)) %>%
+    # hc_plotOptions(series = list(dataLabels = list(enabled = TRUE))) %>%
+    hc_tooltip(enabled = TRUE)
+  
+  
+  
+  chart
+  
+})
+
 
