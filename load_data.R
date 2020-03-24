@@ -286,7 +286,7 @@ ccaa_longer <- ccaa_casos_longer %>%
     left_join(ccaa_uci_longer %>% 
                   select(-CCAA),
               by = c("cod_ine", "fecha"))
-ccaa_longer$fecha <- as.Date(as.character(ccaa_longer$fecha), format = "%d/%m/%y")
+ccaa_longer$fecha <- lubridate::ymd(ccaa_longer$fecha)
 
 pob_ccaa <- readRDS("data/pob_ccaa.rds")
 
