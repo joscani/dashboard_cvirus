@@ -79,5 +79,6 @@ body <- dashboardBody(
 dashboardPage(title="Corona Virus Tracker",
               header,
               sidebar,
-              body
+              body,
+              skin = "purple"
 )

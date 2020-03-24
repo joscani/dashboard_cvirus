@@ -37,9 +37,14 @@ output$tabla_evolutivo_ccaa <- renderHighchart({
     # hc_plotOptions(series = list(dataLabels = list(enabled = TRUE))) %>%
     hc_tooltip(enabled = TRUE)
   
+  if(input$y_scale_ccaa == "Log"){
+    return(chart %>% 
+             hc_yAxis(type = "logarithmic") %>% 
+             hc_subtitle(text = "Escala Logaritmica"))
+  } else{
+    return(chart %>%  hc_subtitle(text = "Escala Lineal"))
+  }
   
-  
-  chart
   
 })
 
@@ -62,9 +67,15 @@ output$tabla_evolutivo_ccaa_raw <- renderHighchart({
     # hc_plotOptions(series = list(dataLabels = list(enabled = TRUE))) %>%
     hc_tooltip(enabled = TRUE)
   
+  if(input$y_scale_ccaa == "Log"){
+    return(chart %>% 
+             hc_yAxis(type = "logarithmic") %>% 
+             hc_subtitle(text = "Escala Logaritmica"))
+  } else{
+    return(chart %>%  hc_subtitle(text = "Escala Lineal"))
+  }
   
   
-  chart
   
 })
 

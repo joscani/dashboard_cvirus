@@ -27,6 +27,15 @@ tab_evolutivo_ccaa <- tabItem(
           multiple = FALSE,
           selectize = TRUE
         ),
+        selectInput(
+          "y_scale_ccaa",
+          "Selecciona scala",
+          choices = c("Lineal","Log"),
+          selected = "Lineal",
+          multiple = FALSE,
+          selectize = TRUE
+        ),
+        
         sliderInput(
           "contagiado_n",
           "Minimo contagiados confirmados",
