@@ -12,11 +12,11 @@ source(paste0(getwd(), "/model/generate_data.R"))
 
 ## John Hopkins data ----
 
-cvirus_confirmed <-  read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
+cvirus_confirmed <-  read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
 
-cvirus_recovered <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+cvirus_recovered <- read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv")
 
-cvirus_death <- read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
+cvirus_death <- read_csv("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
 
 # Pasamos a formato largo 
 
@@ -25,12 +25,16 @@ cvirus_confirmed_longer <- cvirus_confirmed %>%
         cols = 5:ncol(cvirus_confirmed),
         values_to = "casos"
     )
+cvirus_confirmed_longer$name <- mdy(cvirus_confirmed_longer$name)
+
 
 cvirus_recovered_longer <-  cvirus_recovered %>% 
     pivot_longer(
         cols = 5:ncol(cvirus_recovered),
         values_to = "recuperados"
     )
+cvirus_recovered_longer$name <- mdy(cvirus_recovered_longer$name)
+
 
 cvirus_death_longer <-  cvirus_death %>% 
     pivot_longer(
@@ -38,6 +42,7 @@ cvirus_death_longer <-  cvirus_death %>%
         values_to = "fallecidos"
     )
 
+cvirus_death_longer$name <- mdy(cvirus_death_longer$name)
 
 
 cvirus_longer <-  cvirus_confirmed_longer %>%
@@ -54,7 +59,7 @@ cvirus_longer <-  cvirus_confirmed_longer %>%
 
 colnames(cvirus_longer) <- c("provincia_estado","pais", "Lat", "Long", "fecha", "casos", "recuperados", "fallecidos")
 
-cvirus_longer$fecha <- as.Date(as.character(cvirus_longer$fecha), format = "%m/%d/%y")
+# cvirus_longer$fecha <- as.Date(as.character(cvirus_longer$fecha), format = "%m/%d/%y")
 
 cvirus_longer <-  cvirus_longer %>% 
     mutate(provincia_estado = if_else(is.na(provincia_estado), pais, provincia_estado)) %>% 
@@ -93,6 +98,16 @@ res  <- cvirus_longer %>%
         casos_nuevos = if_else(casos_nuevos == 0,
                                lag(casos_nuevos, 1),
                                casos_nuevos),
+        
+        recuperados = if_else(is.na(recuperados),
+                               recuperados_prev_day,
+                               recuperados),
+        
+        recuperados_nuevos = if_else(is.na(recuperados_nuevos),
+                               lag(recuperados_nuevos, 1),
+                               recuperados_nuevos),
+        
+        
         dia_since_100 = row_number()
     )
 
@@ -101,8 +116,8 @@ cvirus_map_data <- res %>%
     group_by(pais) %>% 
     filter(fecha == max(fecha)) %>% 
     mutate(casos = sum(casos),
-           recuperados = sum(recuperados),
-           fallecidos = sum(fallecidos)) %>% 
+           recuperados = sum(recuperados, na.rm = TRUE),
+           fallecidos = sum(fallecidos, na.rm = TRUE)) %>% 
     ungroup()
 
 
