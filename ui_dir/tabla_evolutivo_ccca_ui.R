@@ -23,19 +23,19 @@ tab_evolutivo_ccaa <- tabItem(
           "ccaa_indicador1",
           "Selecciona variable",
           choices = var_ccaa_list,
-          selected = var_ccaa_list[3],
+          selected = var_ccaa_list[4],
           multiple = FALSE,
           selectize = TRUE
         ),
         selectInput(
           "y_scale_ccaa",
           "Selecciona scala",
-          choices = c("Lineal","Log"),
+          choices = c("Lineal", "Log"),
           selected = "Lineal",
           multiple = FALSE,
           selectize = TRUE
         ),
-        
+
         sliderInput(
           "contagiado_n",
           "Minimo contagiados confirmados",
@@ -43,7 +43,16 @@ tab_evolutivo_ccaa <- tabItem(
           max = 100,
           value = 20,
           step = 1
-        )
+        ),
+                sliderInput(
+          "dias_back",
+          "Dias atrás para comparar incremento",
+          min = 1,
+          max = 14,
+          value = 2,
+          step = 1
+        ),
+        
       )
     ),
 
@@ -53,8 +62,10 @@ tab_evolutivo_ccaa <- tabItem(
         type = "tabs",
         tabPanel("Indicadores", highchartOutput("tabla_evolutivo_ccaa_raw")),
         tabPanel("Indicadores x 100 mil habitante", highchartOutput("tabla_evolutivo_ccaa"))
+      ),
+      tabsetPanel(
+        tabPanel("Incrementos relativos", highchartOutput("tabla_evolutivo_ccaa_inc_relativo"))
       )
     )
   )
 )
-

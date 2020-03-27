@@ -80,3 +80,38 @@ output$tabla_evolutivo_ccaa_raw <- renderHighchart({
 })
 
 
+
+output$tabla_evolutivo_ccaa_inc_relativo <- renderHighchart({
+  
+  validate(
+    need(nrow(reactive_ccaas_selected()) != 0, "Selecciona al menos una CCAA")
+  ) 
+  tmp <- reactive_ccaas_selected()
+  tmp <- tmp %>% 
+    arrange(fecha) %>% 
+    mutate(indicador_actual = variable,
+           indicador_prev = lag(variable, input$dias_back),
+           indicador = (indicador_actual - indicador_prev)/ indicador_prev )
+  
+  chart <- tmp %>% 
+    hchart("spline", hcaes(x = dias, y = indicador, group = CCAA)) %>% 
+    hc_xAxis( title = list( text = paste0("Dias desde que se confirmaron ", input$contagiado_n, " casos")),
+              labels = list(style=list(fonSize = "16px")) ) %>%
+    hc_yAxis( title = list( text = paste0(input$ccaa_indicador1, " Incremento relativo ")), labels = list(style=list(fonSize = "16px")) ) %>%
+    hc_legend(enabled = FALSE) %>%
+    hc_title(text = paste0("Incremento relativo de ",input$ccaa_indicador1, " respecto a hace ",input$dias_back, " días")) %>%
+    hc_tooltip(enabled = TRUE)
+  
+  if(input$y_scale_ccaa == "Log"){
+    return(chart %>% 
+             hc_yAxis(type = "logarithmic") %>% 
+             hc_subtitle(text = "Escala Logaritmica"))
+  } else{
+    return(chart %>%  hc_subtitle(text = "Escala Lineal"))
+  }
+  
+  
+  
+})
+
+

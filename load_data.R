@@ -1,11 +1,11 @@
 ## Leer datos de los repositoros
 
 # Librerías ----
-library(tidyverse)
-library(leaflet)
-library(shinydashboard)
-library(htmltools)
-library(leafpop)
+# library(tidyverse)
+# library(leaflet)
+# library(shinydashboard)
+# library(htmltools)
+# library(leafpop)
 
 source(paste0(getwd(), "/model/generate_data.R"))
 # source(paste0(getwd(), "/model/generate_ccaa_data.R"))
@@ -345,10 +345,12 @@ ccaa_data_subplots <-  ccaa_longer %>%
 ccaas_choice <-  setdiff(unique(ccaa_data_subplots$CCAA), "Total")
 var_ccaa_list <- c("casos",
                    "recuperados",
+                   "ingresos_uci",
                    "fallecidos",
                    "casos_nuevos",
                    "recuperados_nuevos",
-                   "fallecidos_nuevos")
+                   "fallecidos_nuevos",
+                   "ingresos_uci_nuevos")
 
 var_ccaa_list_mapa <- c("casos_por_100_mil_habitantes",
                         "recuperados_por_100_mil_habitantes",
