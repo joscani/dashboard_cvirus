@@ -44,7 +44,7 @@ sidebar <- dashboardSidebar(
                 br(),
                 br(),
                 p("  Datos España: "),
-                p(tags$a(href="www.rstudio.com", " Datadista")),
+                p(tags$a(href="https://github.com/datadista/datasets/tree/master/COVID%2019", " Datadista")),
                 br(),
                 
                 p("  Datos Globales: "),
