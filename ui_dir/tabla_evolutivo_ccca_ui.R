@@ -15,7 +15,7 @@ tab_evolutivo_ccaa <- tabItem(
           "ccaa_selected",
           "Selecciona Comunidad autónoma",
           choices = ccaas_choice,
-          selected = sample(ccaas_choice, 3),
+          selected = "Total",
           multiple = TRUE,
           selectize = TRUE
         ),
@@ -63,8 +63,11 @@ tab_evolutivo_ccaa <- tabItem(
         tabPanel("Indicadores", highchartOutput("tabla_evolutivo_ccaa_raw")),
         tabPanel("Indicadores x 100 mil habitante", highchartOutput("tabla_evolutivo_ccaa"))
       ),
+     
       tabsetPanel(
-        tabPanel("Incrementos relativos", highchartOutput("tabla_evolutivo_ccaa_inc_relativo"))
+        tabPanel("Incrementos relativos", highchartOutput("tabla_evolutivo_ccaa_inc_relativo")),
+        p(" Ejemplo: Eligiendo como indicador el número de fallecidos, y 7 días atrás nos muestra
+          el incremento relativo. Si es 1 significa que 7 días sería el tiempo de duplicación del número de fallecidos. El objetivo final sería llegar a valor -1 que implicaría que en ese período (7 días ) no se ha producido  ningún fallecido más ")
       )
     )
   )

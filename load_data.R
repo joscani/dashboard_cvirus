@@ -340,9 +340,11 @@ ccaa_data_subplots <-  ccaa_longer %>%
         dia_since_1 = row_number()
     )
 
+ccaa_data_subplots$pob2019[ccaa_data_subplots$CCAA == "Total"] <-
+    sum( unique( ccaa_data_subplots$pob2019[ ccaa_data_subplots$CCAA != "Total"] ),
+        na.rm = TRUE)
 
-
-ccaas_choice <-  setdiff(unique(ccaa_data_subplots$CCAA), "Total")
+ccaas_choice <- unique(ccaa_data_subplots$CCAA)
 var_ccaa_list <- c("casos",
                    "recuperados",
                    "ingresos_uci",

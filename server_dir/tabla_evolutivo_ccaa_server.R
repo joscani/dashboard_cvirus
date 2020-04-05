@@ -5,7 +5,7 @@ require(highcharter)
 reactive_ccaas_selected <- reactive({
   
   tmp <- ccaa_data_subplots %>%
-    filter(CCAA != "Total" & casos >= input$contagiado_n) %>%
+    filter( casos >= input$contagiado_n) %>%
     mutate(dias = row_number()) %>% 
     select_at(c("CCAA","fecha", input$ccaa_indicador1, "pob2019", "dias")) %>% 
     filter(CCAA %in% input$ccaa_selected)
@@ -14,9 +14,6 @@ reactive_ccaas_selected <- reactive({
   return(tmp)
   
 })
-
-
-
 
 output$tabla_evolutivo_ccaa <- renderHighchart({
   
@@ -78,8 +75,6 @@ output$tabla_evolutivo_ccaa_raw <- renderHighchart({
   
   
 })
-
-
 
 output$tabla_evolutivo_ccaa_inc_relativo <- renderHighchart({
   
