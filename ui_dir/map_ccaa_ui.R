@@ -6,10 +6,11 @@ tab_mapa_ccaa <- tabItem(
   h2("Tarda unos segundos en cargar datos y mapa. Paciencia"),
   h2("Fecha actualización datos: ") , h2(textOutput("max_fecha_ccaa")),
   fluidRow(
-    valueBoxOutput("sp_contagiados"),
-    valueBoxOutput("sp_recuperados"),
-    valueBoxOutput("sp_fallecidos"),
-    valueBoxOutput("sp_activos")
+    valueBoxOutput("sp_contagiados", width = 6),
+    valueBoxOutput("sp_fallecidos", width = 6)
+    # valueBoxOutput("sp_recuperados"),
+    
+    # valueBoxOutput("sp_activos")
   ),
   br(),
   fluidRow(

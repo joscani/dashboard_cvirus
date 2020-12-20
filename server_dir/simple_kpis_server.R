@@ -53,14 +53,14 @@ output$sp_contagiados <- renderValueBox({
 })
 
 
-output$sp_recuperados <- renderValueBox({
-    recuperados_total <- mapa_ccaa %>%
-        # filter(fecha == max(fecha)) %>%
-        summarise(recuperados_total = sum(recuperados)) %>%
-        pull(recuperados_total)
-    
-    valueBox(recuperados_total, subtitle = "Recuperados", color = "green")
-})
+# output$sp_recuperados <- renderValueBox({
+#     recuperados_total <- mapa_ccaa %>%
+#         # filter(fecha == max(fecha)) %>%
+#         summarise(recuperados_total = sum(recuperados)) %>%
+#         pull(recuperados_total)
+#     
+#     valueBox(recuperados_total, subtitle = "Recuperados", color = "green")
+# })
 
 output$sp_fallecidos <- renderValueBox({
     fallecidos_total <- mapa_ccaa %>%
@@ -71,16 +71,16 @@ output$sp_fallecidos <- renderValueBox({
     valueBox(fallecidos_total, subtitle = "Fallecidos", color = "red")
 })
 
-output$sp_activos <- renderValueBox({
-    activos_total <- mapa_ccaa %>%
-        # filter(fecha == max(fecha)) %>%
-        summarise(casos_total = sum(casos),
-                  fallecidos_total = sum(fallecidos),
-                  recuperados_total = sum(recuperados)) %>%
-        mutate(activos_total = casos_total -  fallecidos_total - recuperados_total) %>% 
-        pull(activos_total)
-    
-    valueBox(activos_total, subtitle = "Casos activos ", color = "orange")
-})
+# output$sp_activos <- renderValueBox({
+#     activos_total <- mapa_ccaa %>%
+#         # filter(fecha == max(fecha)) %>%
+#         summarise(casos_total = sum(casos),
+#                   fallecidos_total = sum(fallecidos),
+#                   recuperados_total = sum(recuperados)) %>%
+#         mutate(activos_total = casos_total -  fallecidos_total - recuperados_total) %>% 
+#         pull(activos_total)
+#     
+#     valueBox(activos_total, subtitle = "Casos activos ", color = "orange")
+# })
 
 

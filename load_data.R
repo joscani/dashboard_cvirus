@@ -173,10 +173,29 @@ cvirus_map_data$labs <- map_chr(seq(nrow(cvirus_map_data)), function(i) {
     ) 
 })
 
+paleta <- scales::brewer_pal(type = "div", palette = "PiYG", direction = -1)
+color_rampa <-  colorRamp(paleta(11))
 pal <- colorNumeric(
-    palette = "Oranges",
-    domain = c(-1, log(1e6))
+    palette = color_rampa,
+    domain = c(-1, log(1e8))
 )
+
+
+
+# altura <- scales::rescale(3 * log( cvirus_map_data$fallecidos + 1 ) , to=c(10,100))
+# anchura <-  scales::rescale(3 * log( cvirus_map_data$fallecidos + 1 ) , to=c(5,80))
+# greenLeafIcon <- makeIcon(
+#     iconUrl = "data/statistics.png",
+#     iconWidth = anchura, iconHeight = altura,
+#     iconAnchorX = 0, iconAnchorY = 0
+# )
+# 
+# leaflet(data = cvirus_map_data) %>% 
+#     addProviderTiles("Stamen.Toner") %>%
+#     addMarkers(lng = ~Long,
+#                lat = ~Lat,
+#                icon = greenLeafIcon)
+
 
 mapa_global_leaf <- leaflet(cvirus_map_data) %>%
     # addProviderTiles('CartoDB.Positron') %>%
@@ -253,59 +272,70 @@ mapa_global_leaf <- leaflet(cvirus_map_data) %>%
 ## Load  ccaa data from datadista github ----
 
 
-ccaa_casos <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos.csv")
+# ccaa_casos <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_casos_long.csv")
 
-ccaa_altas <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_altas.csv")
+# ccaa_altas <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_altas_long.csv")
 
-ccaa_fallecidos <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_fallecidos.csv")
+# ccaa_fallecidos <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_fallecidos.csv")
 
-ccaa_uci <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_uci.csv")
+# ccaa_uci <- read_csv("https://raw.githubusercontent.com/datadista/datasets/master/COVID%2019/ccaa_covid19_uci.csv")
 
+iscii <-  read_csv("https://github.com/datadista/datasets/raw/master/COVID%2019/ccaa_covid19_datos_isciii_nueva_serie.csv")  %>% 
+    rename("CCAA"="ccaa")
 
-ccaa_casos_longer <-  ccaa_casos %>% 
-    pivot_longer(
-        cols = 3:ncol(ccaa_casos),
-        values_to = "casos"
-    ) %>% 
-    rename("fecha" = "name")
+ccaa_fallecidos_longer <-  read_csv("https://github.com/datadista/datasets/raw/master/COVID%2019/ccaa_covid19_fallecidos_por_fecha_defuncion_nueva_serie_long.csv") %>% 
+    rename("fallecidos"= "Fallecidos",
+           "fecha" = "Fecha")
 
-ccaa_altas_longer <-  ccaa_altas %>% 
-    pivot_longer(
-        cols = 3:ncol(ccaa_altas),
-        values_to = "altas"
-    ) %>% 
-    rename("fecha" = "name")
+ccaa_casos_longer <-  iscii %>% 
+    select(cod_ine, CCAA, fecha, num_casos) %>% 
+    rename(casos = num_casos)
 
-ccaa_fallecidos_longer <-  ccaa_fallecidos %>% 
-    pivot_longer(
-        cols = 3:ncol(ccaa_fallecidos),
-        values_to = "fallecidos"
-    ) %>% 
-    rename("fecha" = "name")
+# ccaa_altas_longer <-  ccaa_altas %>% 
+#     pivot_longer(
+#         cols = 3:ncol(ccaa_altas),
+#         values_to = "altas"
+#     ) %>% 
+#     rename("fecha" = "name")
 
-ccaa_uci_longer <-  ccaa_uci %>% 
-    pivot_longer(
-        cols = 3:ncol(ccaa_uci),
-        values_to = "ingresos_uci"
-    ) %>% 
-    rename("fecha" = "name")
+# ccaa_fallecidos_longer <-  ccaa_fallecidos %>% 
+#     pivot_longer(
+#         cols = 3:ncol(ccaa_fallecidos),
+#         values_to = "fallecidos"
+#     ) %>% 
+#     rename("fecha" = "name")
+
+# ccaa_uci_longer <-  ccaa_uci %>% 
+#     pivot_longer(
+#         cols = 3:ncol(ccaa_uci),
+#         values_to = "ingresos_uci"
+#     ) %>% 
+#     rename("fecha" = "name")
 
 
 ccaa_longer <- ccaa_casos_longer %>% 
-    left_join(ccaa_altas_longer %>% 
-                  select(-CCAA),
-              by = c("cod_ine", "fecha")) %>% 
+    # left_join(ccaa_altas_longer %>% 
+    #               select(-CCAA),
+    #           by = c("cod_ine", "fecha")) %>% 
     left_join(ccaa_fallecidos_longer %>% 
                   select(-CCAA),
-              by = c("cod_ine", "fecha")) %>% 
-    left_join(ccaa_uci_longer %>% 
-                  select(-CCAA),
-              by = c("cod_ine", "fecha"))
+              by = c("cod_ine", "fecha")) # %>% 
+    # left_join(ccaa_uci_longer %>% 
+    #               select(-CCAA),
+    #           by = c("cod_ine", "fecha"))
 ccaa_longer$fecha <- lubridate::ymd(ccaa_longer$fecha)
 
 pob_ccaa <- readRDS("data/pob_ccaa.rds")
 
-ccaa_longer <- ccaa_longer %>% left_join(pob_ccaa, by = c("cod_ine" = "Codigo"))
+ccaa_longer <- ccaa_longer %>% 
+    left_join(pob_ccaa, by = c("cod_ine" = "Codigo")) %>% 
+    group_by(CCAA) %>% 
+    arrange(fecha) %>% 
+    mutate(
+        casos = cumsum(coalesce(casos,0)),
+        fallecidos = cumsum(coalesce(fallecidos, 0))
+           ) %>% 
+    ungroup()
 
 ## Mapa ccaa ----
 
@@ -317,20 +347,20 @@ ccaa_data_subplots <-  ccaa_longer %>%
     arrange(fecha) %>% 
     summarise(
         casos = sum(casos),
-        recuperados = sum(altas),
+        # recuperados = sum(altas),
         fallecidos = sum(fallecidos),
-        ingresos_uci = sum(ingresos_uci),
+        # ingresos_uci = sum(ingresos_uci),
         pob2019 = first(pob2019)
     ) %>% 
     mutate(
         casos_prev_day = lag(casos, n = 1,  default = 0),
         casos_nuevos = casos - casos_prev_day,
-        recuperados_prev_day = lag(recuperados, n = 1, default = 0),
-        recuperados_nuevos = recuperados - recuperados_prev_day,
+        # recuperados_prev_day = lag(recuperados, n = 1, default = 0),
+        # recuperados_nuevos = recuperados - recuperados_prev_day,
         fallecidos_prev_day = lag(fallecidos, n = 1, default = 0),
         fallecidos_nuevos = fallecidos - fallecidos_prev_day,
-        ingresos_uci_prev_day = lag(ingresos_uci, n = 1, default = 0),
-        ingresos_uci_nuevos = ingresos_uci - ingresos_uci_prev_day
+        # ingresos_uci_prev_day = lag(ingresos_uci, n = 1, default = 0),
+        # ingresos_uci_nuevos = ingresos_uci - ingresos_uci_prev_day
     ) %>% 
     filter(casos >= 1) %>%
     mutate(
@@ -346,16 +376,18 @@ ccaa_data_subplots$pob2019[ccaa_data_subplots$CCAA == "Total"] <-
 
 ccaas_choice <- unique(ccaa_data_subplots$CCAA)
 var_ccaa_list <- c("casos",
-                   "recuperados",
-                   "ingresos_uci",
+                   # "recuperados",
+                   # "ingresos_uci",
                    "fallecidos",
                    "casos_nuevos",
-                   "recuperados_nuevos",
-                   "fallecidos_nuevos",
-                   "ingresos_uci_nuevos")
+                   # "recuperados_nuevos",
+                   "fallecidos_nuevos"
+                   # ,
+                   # "ingresos_uci_nuevos"
+                   )
 
 var_ccaa_list_mapa <- c("casos_por_100_mil_habitantes",
-                        "recuperados_por_100_mil_habitantes",
+                        # "recuperados_por_100_mil_habitantes",
                         "fallecidos_por_100_mil_habitantes")
 
 
@@ -364,10 +396,10 @@ ccaa_map_data <- ccaa_data_subplots %>%
     filter(CCAA != "Total" & fecha == max(fecha)) %>% 
     mutate (
         casos_por_100_mil_habitantes = 1e5 * casos / pob2019,
-        recuperados_por_100_mil_habitantes = 1e5 * recuperados / pob2019,
+        # recuperados_por_100_mil_habitantes = 1e5 * recuperados / pob2019,
         fallecidos_por_100_mil_habitantes = 1e5 * fallecidos / pob2019,
         casos_nuevos_por_100_mil_habitantes = 1e5 * casos_nuevos / pob2019,
-        recuperados_diarios_por_100_mil_habitantes = 1e5 * recuperados_nuevos / pob2019,
+        # recuperados_diarios_por_100_mil_habitantes = 1e5 * recuperados_nuevos / pob2019,
         fallecidos_diarios_por_100_mil_habitantes = 1e5 * fallecidos_nuevos / pob2019
         
     ) %>% 
@@ -403,9 +435,10 @@ ccaa_map_data <- ccaa_data_subplots %>%
 ccaa_map_data$labs <- map_chr(seq(nrow(ccaa_map_data)), function(i) {
     paste0( '<p>', ccaa_map_data[i, "CCAA"], '<p></p>', 
             "Casos: ", ccaa_map_data[i, "casos"], '<p></p>', 
-            "Recuperados: ",ccaa_map_data[i, "recuperados"],'</p><p>', 
-            "Fallecidos: ",ccaa_map_data[i, "fallecidos"], '</p><p>',
-            "Ingresos UCI: ",ccaa_map_data[i, "ingresos_uci"], '</p>') 
+            # "Recuperados: ",ccaa_map_data[i, "recuperados"],'</p><p>', 
+            "Fallecidos: ",ccaa_map_data[i, "fallecidos"], # '</p><p>'
+            # ,"Ingresos UCI: ",ccaa_map_data[i, "ingresos_uci"],
+            '</p>') 
 })
 
 
