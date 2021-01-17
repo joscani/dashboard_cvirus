@@ -285,7 +285,8 @@ iscii <-  read_csv("https://github.com/datadista/datasets/raw/master/COVID%2019/
 
 ccaa_fallecidos_longer <-  read_csv("https://github.com/datadista/datasets/raw/master/COVID%2019/ccaa_covid19_fallecidos_por_fecha_defuncion_nueva_serie_long.csv") %>% 
     rename("fallecidos"= "Fallecidos",
-           "fecha" = "Fecha")
+           "fecha" = "Fecha",
+           "cod_ine" = "cod_ccaa")
 
 ccaa_casos_longer <-  iscii %>% 
     select(cod_ine, CCAA, fecha, num_casos) %>% 
